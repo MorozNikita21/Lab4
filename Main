@@ -1,0 +1,180 @@
+import java.io.*;
+
+import java.util.*;
+
+public class GradientDescentSolver {
+
+private static final double LEARNING_RATE = 0.01; // Скорость обучения
+
+private static final double EPSILON = 0.0001; // Пороговое значение для остановки
+
+public static void main(String[] args) {
+
+// Чтение входных данных из файла
+
+List equations = readEquationsFromFile("input.txt");
+
+// Получение количества переменных
+
+int numVariables = getNumVariables(equations);
+
+// Инициализация начальных значений переменных
+
+double[] variables = new double[numVariables];
+
+Arrays.fill(variables, 0.0);
+
+// Обновление значений переменных методом градиентного спуска
+
+boolean converged = false;
+
+while (!converged) {
+
+double[] gradients = calculateGradients(equations, variables);
+
+for (int i = 0; i readEquationsFromFile(String filename) {
+
+List equations = new ArrayList();
+
+try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+
+String line;
+
+while ((line = reader.readLine()) != null) {
+
+equations.add(line);
+
+}
+
+} catch (IOException e) {
+
+e.printStackTrace();
+
+}
+
+return equations;
+
+}
+
+// Метод для получения количества переменных в системе уравнений
+
+private static int getNumVariables(List equations) {
+
+int numVariables = 0;
+
+for (String equation : equations) {
+
+String[] terms = equation.split("\\s[=]+\\s");
+
+for (String term : terms) {
+
+String[] variables = term.split("\\s[+\\-/^]+\\s*");
+
+for (String variable : variables) {
+
+if (variable.matches("[a-zA-Z]+[0-9]*")) {
+
+numVariables++;
+
+}
+
+}
+
+}
+
+}
+
+return numVariables;
+
+}
+
+// Метод для вычисления градиентов функций по переменным
+
+private static double[] calculateGradients(List equations, double[] variables) {
+
+double[] gradients = new double[variables.length];
+
+Arrays.fill(gradients, 0.0);
+
+for (String equation : equations) {
+
+String[] terms = equation.split("\\s[=]+\\s");
+
+String[] leftSide = terms[0].split("\\s[+\\-]+\\s");
+
+String[] rightSide = terms[1].split("\\s[+\\-]+\\s");
+
+double leftSideValue = evaluateExpression(leftSide, variables);
+
+double rightSideValue = evaluateExpression(rightSide, variables);
+
+double equationValue = leftSideValue - rightSideValue;
+
+for (int i = 0; i EPSILON) {
+
+return false;
+
+}
+
+}
+
+return true;
+
+}
+
+// Метод для вычисления значений функций f(x1, x2, ..., xn)
+
+private static double[] calculateFunctionValues(List equations, double[] variables) {
+double[] functionValues = new double[equations.size()];
+
+for (int i = 0; i < equations.size(); i++) {
+
+String equation = equations.get(i);
+
+functionValues[i] = evaluateExpression(new String[]{equation}, variables);
+
+}
+
+return functionValues;
+
+}
+
+// Метод для записи результатов в файл
+
+private static void writeResultsToFile(double[] variables, double[] functionValues, String filename) {
+
+try (PrintWriter writer = new PrintWriter(new FileWriter(filename))) {
+
+for (int i = 0; i < variables.length; i++) {
+
+writer.printf("x%d: %.4f%n", i + 1, variables[i]);
+
+}
+
+writer.println();
+
+for (int i = 0; i < functionValues.length; i++) {
+
+writer.printf("f%d: %.4f%n", i + 1, functionValues[i]);
+
+}
+
+} catch (IOException e) {
+
+e.printStackTrace();
+
+}
+
+}
+
+// Метод для получения индекса переменной по её имени
+
+private static int getVariableIndex(String variable) {
+
+String indexString = variable.replaceAll("[a-zA-Z]+", "");
+
+return Integer.parseInt(indexString) - 1;
+
+}
+
+}
